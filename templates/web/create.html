@@ -7,248 +7,53 @@
     <div class="page-header">
         <a href="{{ url_for('dashboard') }}" class="back-link">&larr; Back to Dashboard</a>
         <h1>Create New Proposal</h1>
-        <p>Fill in the client details to generate a professional proposal</p>
+        <p>Paste your client information below and we'll generate a professional proposal</p>
     </div>
 
-    <form id="proposal-form" method="POST" action="{{ url_for('create_proposal') }}">
-        <!-- Section 1: Client Information -->
-        <div class="form-section">
-            <h2>1. Client Information</h2>
+    <div class="form-section">
+        <div class="form-group">
+            <label for="client_info">Paste Client Information</label>
+            <textarea id="client_info" name="client_info" rows="20"
+                      placeholder="Paste all client information here...
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="client_name">Client/Company Name *</label>
-                    <input type="text" id="client_name" name="client_name" required
-                           placeholder="e.g., Acme Corporation">
-                </div>
+Example:
+Company: Acme Corporation
+Industry: Technology
+Location: Toronto, ON
 
-                <div class="form-group">
-                    <label for="industry">Industry *</label>
-                    <input type="text" id="industry" name="industry" required
-                           placeholder="e.g., Technology, Retail, Healthcare">
-                </div>
-            </div>
+Current Challenges:
+- Low website traffic
+- Poor conversion rates
+- Limited brand awareness
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="brands">Brands/Products (comma-separated)</label>
-                    <input type="text" id="brands" name="brands"
-                           placeholder="e.g., Product A, Service B, Brand C">
-                </div>
+Goals:
+- Increase leads by 50%
+- Improve online visibility
+- Generate more sales
 
-                <div class="form-group">
-                    <label for="location">Location</label>
-                    <input type="text" id="location" name="location"
-                           placeholder="e.g., Toronto, Ontario">
-                </div>
-            </div>
+Budget: $2,500/month
 
-            <div class="form-group">
-                <label for="situation_description">Current Situation</label>
-                <textarea id="situation_description" name="situation_description" rows="3"
-                          placeholder="Brief description of the client's current marketing situation"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="pain_points">Pain Points / Challenges (one per line)</label>
-                <textarea id="pain_points" name="pain_points" rows="3"
-                          placeholder="Limited online visibility&#10;Low conversion rates&#10;Inconsistent lead generation"></textarea>
-            </div>
+Services needed: Google Ads, SEO"></textarea>
         </div>
 
-        <!-- Section 2: Goals -->
-        <div class="form-section">
-            <h2>2. Goals & Objectives</h2>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="short_term_goals">Short-Term Goals (3-6 months, one per line)</label>
-                    <textarea id="short_term_goals" name="short_term_goals" rows="3"
-                              placeholder="Increase website traffic by 50%&#10;Generate 100 qualified leads per month&#10;Improve brand awareness"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="long_term_goals">Long-Term Goals (1-3 years, one per line)</label>
-                    <textarea id="long_term_goals" name="long_term_goals" rows="3"
-                              placeholder="Establish market leadership&#10;Build sustainable organic growth&#10;Expand into new markets"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 3: Target Audience -->
-        <div class="form-section">
-            <h2>3. Target Audience</h2>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="demographics">Demographics (one per line)</label>
-                    <textarea id="demographics" name="demographics" rows="3"
-                              placeholder="Age 25-54&#10;Household income $75k+&#10;Urban professionals"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="psychographics">Psychographics (one per line)</label>
-                    <textarea id="psychographics" name="psychographics" rows="3"
-                              placeholder="Quality-conscious&#10;Tech-savvy&#10;Values convenience"></textarea>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="behaviors">Behaviors / Search Habits (one per line)</label>
-                <textarea id="behaviors" name="behaviors" rows="3"
-                          placeholder="Active on social media&#10;Researches before purchasing&#10;Responds to reviews"></textarea>
-            </div>
-        </div>
-
-        <!-- Section 4: Competitive Landscape -->
-        <div class="form-section">
-            <h2>4. Competitive Landscape</h2>
-
-            <div class="form-group">
-                <label for="market_overview">Market Overview</label>
-                <textarea id="market_overview" name="market_overview" rows="2"
-                          placeholder="Brief overview of the competitive market"></textarea>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="competitors">Main Competitors (one per line)</label>
-                    <textarea id="competitors" name="competitors" rows="3"
-                              placeholder="Competitor A&#10;Competitor B&#10;Competitor C"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="opportunities">Market Opportunities (one per line)</label>
-                    <textarea id="opportunities" name="opportunities" rows="3"
-                              placeholder="Underserved segment&#10;Emerging trend&#10;Competitor weakness"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 5: Services -->
-        <div class="form-section">
-            <h2>5. Services & Strategy</h2>
-
-            <div class="services-grid">
-                <!-- Google Ads -->
-                <div class="service-card">
-                    <div class="service-header">
-                        <label class="toggle">
-                            <input type="checkbox" name="google_ads_enabled" id="google_ads_enabled" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <div class="service-info">
-                            <img src="https://mediaforce.ca/wp-content/uploads/2025/11/guide-google-ads.png"
-                                 alt="Google Ads" height="24">
-                            <span>Google Ads</span>
-                        </div>
-                    </div>
-                    <div class="service-body">
-                        <div class="form-group">
-                            <label for="google_ads_budget">Monthly Ad Spend ($)</label>
-                            <input type="number" id="google_ads_budget" name="google_ads_budget"
-                                   value="1500" min="0" step="100">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SEO -->
-                <div class="service-card">
-                    <div class="service-header">
-                        <label class="toggle">
-                            <input type="checkbox" name="seo_enabled" id="seo_enabled" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <div class="service-info">
-                            <span class="service-icon">&#128269;</span>
-                            <span>SEO</span>
-                        </div>
-                    </div>
-                    <div class="service-body">
-                        <div class="form-group">
-                            <label for="seo_fee">Monthly Fee ($)</label>
-                            <input type="number" id="seo_fee" name="seo_fee"
-                                   value="1100" min="0" step="100">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Paid Social -->
-                <div class="service-card">
-                    <div class="service-header">
-                        <label class="toggle">
-                            <input type="checkbox" name="paid_social_enabled" id="paid_social_enabled">
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <div class="service-info">
-                            <span class="service-icon">&#128247;</span>
-                            <span>Paid Social</span>
-                        </div>
-                    </div>
-                    <div class="service-body">
-                        <div class="form-group">
-                            <label for="paid_social_budget">Monthly Ad Spend ($)</label>
-                            <input type="number" id="paid_social_budget" name="paid_social_budget"
-                                   value="0" min="0" step="100">
-                        </div>
-                        <div class="form-group">
-                            <label>Platforms</label>
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" name="social_platforms" value="Facebook"> Facebook</label>
-                                <label><input type="checkbox" name="social_platforms" value="Instagram"> Instagram</label>
-                                <label><input type="checkbox" name="social_platforms" value="LinkedIn"> LinkedIn</label>
-                                <label><input type="checkbox" name="social_platforms" value="TikTok"> TikTok</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 6: Investment -->
-        <div class="form-section">
-            <h2>6. Investment</h2>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="monthly_retainer">Monthly Management Fee ($) *</label>
-                    <input type="number" id="monthly_retainer" name="monthly_retainer" required
-                           value="899" min="0" step="100">
-                    <small>Default: Google Ads $899/mo, SEO $1,100/mo</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="ad_spend">Total Monthly Ad Spend ($)</label>
-                    <input type="number" id="ad_spend" name="ad_spend"
-                           value="1500" min="0" step="100">
-                    <small>Combined ad spend across all platforms</small>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="proposal_date">Proposal Date</label>
-                <input type="date" id="proposal_date" name="proposal_date"
-                       value="{{ now().strftime('%Y-%m-%d') if now is defined else '' }}">
-            </div>
-        </div>
-
-        <!-- Actions -->
         <div class="form-actions">
-            <button type="button" class="btn btn-outline" onclick="previewProposal()">
-                Preview
-            </button>
-            <button type="submit" class="btn btn-primary">
+            <button type="button" class="btn btn-primary btn-lg" onclick="generateProposal()">
                 Generate Proposal
             </button>
         </div>
-    </form>
+    </div>
+
+    <div id="loading" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Generating your proposal...</p>
+    </div>
 </div>
 
 <!-- Preview Modal -->
 <div id="preview-modal" class="modal">
     <div class="modal-content modal-fullscreen">
         <div class="modal-header">
-            <h2>Proposal Preview</h2>
+            <h2>Your Proposal</h2>
             <button class="modal-close" onclick="closePreview()">&times;</button>
         </div>
         <div class="modal-body">
@@ -256,40 +61,126 @@
         </div>
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closePreview()">Close</button>
-            <button class="btn btn-primary" onclick="downloadProposal()">Download PDF</button>
+            <button class="btn btn-outline" onclick="copyHtml()">Copy HTML</button>
+            <button class="btn btn-primary" onclick="downloadProposal()">Print / Save PDF</button>
         </div>
     </div>
 </div>
 {% endblock %}
 
+{% block extra_css %}
+<style>
+.create-proposal {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.form-section {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.form-group textarea {
+    width: 100%;
+    min-height: 400px;
+    padding: 1rem;
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    resize: vertical;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.form-actions {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.btn-lg {
+    padding: 1rem 3rem;
+    font-size: 1.1rem;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-overlay p {
+    margin-top: 1rem;
+    color: var(--primary);
+    font-weight: 500;
+}
+</style>
+{% endblock %}
+
 {% block extra_js %}
 <script>
-function previewProposal() {
-    const form = document.getElementById('proposal-form');
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
+let generatedHtml = '';
 
-    // Handle checkboxes and multi-selects
-    data.social_platforms = formData.getAll('social_platforms');
+function generateProposal() {
+    const clientInfo = document.getElementById('client_info').value.trim();
 
-    fetch('/api/preview', {
+    if (!clientInfo) {
+        alert('Please paste client information first');
+        return;
+    }
+
+    document.getElementById('loading').style.display = 'flex';
+
+    fetch('/api/generate-from-text', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({ text: clientInfo })
     })
     .then(response => response.json())
     .then(result => {
+        document.getElementById('loading').style.display = 'none';
+
         if (result.success) {
+            generatedHtml = result.html;
             const frame = document.getElementById('preview-frame');
             frame.srcdoc = result.html;
             document.getElementById('preview-modal').classList.add('active');
         } else {
-            alert('Error generating preview: ' + result.error);
+            alert('Error generating proposal: ' + result.error);
         }
     })
     .catch(error => {
+        document.getElementById('loading').style.display = 'none';
         alert('Error: ' + error.message);
     });
 }
@@ -298,23 +189,15 @@ function closePreview() {
     document.getElementById('preview-modal').classList.remove('active');
 }
 
-function downloadProposal() {
-    const frame = document.getElementById('preview-frame');
-    const content = frame.contentDocument || frame.contentWindow.document;
-
-    // Open print dialog for PDF
-    frame.contentWindow.print();
+function copyHtml() {
+    navigator.clipboard.writeText(generatedHtml).then(() => {
+        alert('HTML copied to clipboard!');
+    });
 }
 
-// Auto-calculate total based on services
-document.querySelectorAll('input[type="number"]').forEach(input => {
-    input.addEventListener('change', updateTotals);
-});
-
-function updateTotals() {
-    const googleAds = parseInt(document.getElementById('google_ads_budget').value) || 0;
-    const paidSocial = parseInt(document.getElementById('paid_social_budget').value) || 0;
-    document.getElementById('ad_spend').value = googleAds + paidSocial;
+function downloadProposal() {
+    const frame = document.getElementById('preview-frame');
+    frame.contentWindow.print();
 }
 </script>
 {% endblock %}

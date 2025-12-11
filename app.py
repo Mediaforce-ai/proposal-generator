@@ -201,6 +201,475 @@ def api_preview():
         }), 500
 
 
+@app.route('/api/generate-from-text', methods=['POST'])
+@login_required
+def api_generate_from_text():
+    """Generate proposal from pasted text"""
+    try:
+        text = request.json.get('text', '')
+        if not text:
+            return jsonify({'success': False, 'error': 'No text provided'}), 400
+
+        # Parse the text and generate proposal
+        html = generate_proposal_from_text(text)
+
+        return jsonify({
+            'success': True,
+            'html': html
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+def parse_client_text(text):
+    """Parse free-form text to extract client information"""
+    import re
+
+    data = {
+        'company': '',
+        'industry': '',
+        'location': '',
+        'challenges': [],
+        'goals': [],
+        'budget': '',
+        'services': [],
+        'contact': '',
+        'website': '',
+        'audience': '',
+        'competitors': []
+    }
+
+    lines = text.strip().split('\n')
+    current_section = None
+
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+
+        lower = line.lower()
+
+        # Detect section headers
+        if any(x in lower for x in ['company:', 'business:', 'client:', 'name:']):
+            data['company'] = re.sub(r'^[^:]+:\s*', '', line)
+            current_section = None
+        elif any(x in lower for x in ['industry:', 'sector:']):
+            data['industry'] = re.sub(r'^[^:]+:\s*', '', line)
+            current_section = None
+        elif any(x in lower for x in ['location:', 'city:', 'address:']):
+            data['location'] = re.sub(r'^[^:]+:\s*', '', line)
+            current_section = None
+        elif any(x in lower for x in ['budget:', 'investment:', 'spend:']):
+            data['budget'] = re.sub(r'^[^:]+:\s*', '', line)
+            current_section = None
+        elif any(x in lower for x in ['website:', 'url:', 'site:']):
+            data['website'] = re.sub(r'^[^:]+:\s*', '', line)
+            current_section = None
+        elif any(x in lower for x in ['contact:', 'email:', 'phone:']):
+            data['contact'] = re.sub(r'^[^:]+:\s*', '', line)
+            current_section = None
+        elif any(x in lower for x in ['audience:', 'target:', 'customer']):
+            if ':' in line:
+                data['audience'] = re.sub(r'^[^:]+:\s*', '', line)
+            current_section = 'audience'
+        elif any(x in lower for x in ['challenge', 'problem', 'pain', 'issue', 'struggle']):
+            current_section = 'challenges'
+        elif any(x in lower for x in ['goal', 'objective', 'target', 'want', 'aim']):
+            current_section = 'goals'
+        elif any(x in lower for x in ['service', 'need', 'looking for', 'interest']):
+            if ':' in line:
+                services_text = re.sub(r'^[^:]+:\s*', '', line)
+                data['services'] = [s.strip() for s in re.split(r'[,;]', services_text) if s.strip()]
+            current_section = 'services'
+        elif any(x in lower for x in ['competitor', 'competition']):
+            current_section = 'competitors'
+        elif line.startswith('-') or line.startswith('•') or line.startswith('*'):
+            # Bullet point - add to current section
+            item = line.lstrip('-•* ').strip()
+            if current_section == 'challenges':
+                data['challenges'].append(item)
+            elif current_section == 'goals':
+                data['goals'].append(item)
+            elif current_section == 'services':
+                data['services'].append(item)
+            elif current_section == 'competitors':
+                data['competitors'].append(item)
+        elif current_section and line:
+            # Non-bullet continuation
+            if current_section == 'challenges':
+                data['challenges'].append(line)
+            elif current_section == 'goals':
+                data['goals'].append(line)
+
+    # Extract budget number if present
+    if data['budget']:
+        budget_match = re.search(r'\$?([\d,]+)', data['budget'])
+        if budget_match:
+            data['budget_num'] = int(budget_match.group(1).replace(',', ''))
+        else:
+            data['budget_num'] = 2500
+    else:
+        data['budget_num'] = 2500
+
+    # Default services if none found
+    if not data['services']:
+        data['services'] = ['Google Ads', 'SEO']
+
+    return data
+
+
+def generate_proposal_from_text(text):
+    """Generate full BMW-style proposal HTML from parsed text"""
+    data = parse_client_text(text)
+
+    company = data['company'] or 'Your Company'
+    industry = data['industry'] or 'Your Industry'
+    location = data['location'] or ''
+    challenges = data['challenges'] or ['Increase online visibility', 'Generate more leads', 'Improve conversion rates']
+    goals = data['goals'] or ['Grow website traffic', 'Increase qualified leads', 'Boost revenue']
+    budget = data['budget_num']
+    services = data['services']
+
+    # Calculate pricing
+    management_fee = 899 if budget < 3000 else 1200 if budget < 5000 else 1500
+    ad_spend = budget - management_fee if budget > management_fee else 1500
+
+    # Determine which services sections to show
+    has_google_ads = any('google' in s.lower() or 'ads' in s.lower() or 'ppc' in s.lower() or 'sem' in s.lower() for s in services)
+    has_seo = any('seo' in s.lower() or 'organic' in s.lower() or 'search engine opt' in s.lower() for s in services)
+    has_social = any('social' in s.lower() or 'facebook' in s.lower() or 'instagram' in s.lower() or 'linkedin' in s.lower() for s in services)
+
+    if not has_google_ads and not has_seo and not has_social:
+        has_google_ads = True
+        has_seo = True
+
+    today = datetime.now().strftime('%B %d, %Y')
+
+    html = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Marketing Proposal - {company}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }}
+        .container {{ max-width: 900px; margin: 0 auto; padding: 0; }}
+
+        /* Header */
+        .header {{
+            background: linear-gradient(135deg, #0e5881 0%, #0a4563 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }}
+        .header img {{ height: 50px; margin-bottom: 20px; }}
+        .header h1 {{ font-size: 2.2rem; font-weight: 600; margin-bottom: 10px; }}
+        .header .subtitle {{ font-size: 1.1rem; opacity: 0.9; }}
+        .header .date {{ margin-top: 20px; font-size: 0.9rem; opacity: 0.8; }}
+
+        /* Sections */
+        .section {{ padding: 40px; }}
+        .section-alt {{ background: #f8f9fa; }}
+        .section-blue {{ background: #e8f4fc; }}
+        .section h2 {{
+            color: #0e5881;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #ffcc33;
+        }}
+
+        /* Cards */
+        .card-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }}
+        .card {{
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }}
+        .card h3 {{ color: #0e5881; font-size: 1.1rem; margin-bottom: 12px; }}
+        .card ul {{ padding-left: 20px; }}
+        .card li {{ margin: 8px 0; }}
+
+        /* Info Box */
+        .info-box {{
+            background: #e8f4fc;
+            border-left: 4px solid #0e5881;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }}
+
+        /* Price Box */
+        .price-section {{ background: #0e5881; color: white; padding: 50px 40px; text-align: center; }}
+        .price-section h2 {{ color: white; border-bottom-color: #ffcc33; }}
+        .price-box {{
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 500px;
+        }}
+        .price {{ font-size: 3rem; font-weight: 700; color: #ffcc33; }}
+        .price-detail {{ margin-top: 15px; opacity: 0.9; }}
+
+        /* Timeline */
+        .timeline {{ margin-top: 20px; }}
+        .timeline-item {{
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }}
+        .timeline-week {{
+            background: #0e5881;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-width: 80px;
+            text-align: center;
+            margin-right: 15px;
+        }}
+        .timeline-content {{ flex: 1; }}
+        .timeline-content h4 {{ color: #0e5881; margin-bottom: 5px; }}
+
+        /* Services Icons */
+        .service-icon {{
+            width: 60px;
+            height: 60px;
+            background: #e8f4fc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }}
+
+        /* Footer */
+        .footer {{
+            background: #0e5881;
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }}
+        .footer h2 {{ color: white; border: none; margin-bottom: 20px; }}
+        .contact-info {{ display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }}
+        .contact-item {{ display: flex; align-items: center; gap: 10px; }}
+
+        /* Mobile */
+        @media (max-width: 768px) {{
+            .header {{ padding: 40px 20px; }}
+            .header h1 {{ font-size: 1.6rem; }}
+            .section {{ padding: 30px 20px; }}
+            .card-grid {{ grid-template-columns: 1fr; }}
+            .price {{ font-size: 2.2rem; }}
+            .contact-info {{ flex-direction: column; gap: 15px; }}
+        }}
+
+        @media print {{
+            .section {{ page-break-inside: avoid; }}
+            .price-section {{ page-break-before: always; }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <img src="https://mediaforce.ca/wp-content/uploads/2025/10/mf-logo2.png" alt="Mediaforce">
+            <h1>Digital Marketing Proposal</h1>
+            <div class="subtitle">Prepared for {company}</div>
+            <div class="date">{today}</div>
+        </div>
+
+        <!-- Understanding Your Business -->
+        <div class="section">
+            <h2>Understanding Your Business</h2>
+            <div class="info-box">
+                <strong>{company}</strong>'''
+
+    if industry:
+        html += f'<br>Industry: {industry}'
+    if location:
+        html += f'<br>Location: {location}'
+
+    html += f'''
+            </div>
+
+            <h3 style="color: #0e5881; margin: 25px 0 15px;">Current Challenges</h3>
+            <ul>'''
+
+    for challenge in challenges[:5]:
+        html += f'<li>{challenge}</li>'
+
+    html += '''
+            </ul>
+        </div>
+
+        <!-- Your Goals -->
+        <div class="section section-alt">
+            <h2>Your Vision for Success</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="service-icon">🎯</div>
+                    <h3>Short-Term Goals</h3>
+                    <ul>'''
+
+    for goal in goals[:3]:
+        html += f'<li>{goal}</li>'
+
+    html += '''
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="service-icon">🚀</div>
+                    <h3>Long-Term Vision</h3>
+                    <ul>
+                        <li>Sustainable growth and market leadership</li>
+                        <li>Strong digital brand presence</li>
+                        <li>Predictable lead generation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Our Approach -->
+        <div class="section section-blue">
+            <h2>Our Approach & Strategy</h2>
+            <div class="card-grid">'''
+
+    if has_google_ads:
+        html += '''
+                <div class="card">
+                    <img src="https://mediaforce.ca/wp-content/uploads/2025/11/guide-google-ads.png" height="40" alt="Google Ads" style="margin-bottom: 15px;">
+                    <h3>Google Ads Management</h3>
+                    <ul>
+                        <li>Strategic keyword targeting</li>
+                        <li>Compelling ad copy creation</li>
+                        <li>Landing page optimization</li>
+                        <li>Conversion tracking setup</li>
+                        <li>Ongoing bid optimization</li>
+                    </ul>
+                </div>'''
+
+    if has_seo:
+        html += '''
+                <div class="card">
+                    <div class="service-icon">🔍</div>
+                    <h3>AI-Friendly SEO</h3>
+                    <ul>
+                        <li>Technical SEO audit & fixes</li>
+                        <li>Content optimization</li>
+                        <li>Local SEO enhancement</li>
+                        <li>Link building outreach</li>
+                        <li>Monthly ranking reports</li>
+                    </ul>
+                </div>'''
+
+    if has_social:
+        html += '''
+                <div class="card">
+                    <div class="service-icon">📱</div>
+                    <h3>Paid Social Media</h3>
+                    <ul>
+                        <li>Facebook & Instagram Ads</li>
+                        <li>LinkedIn advertising</li>
+                        <li>Audience targeting</li>
+                        <li>Creative development</li>
+                        <li>Performance optimization</li>
+                    </ul>
+                </div>'''
+
+    html += '''
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="section">
+            <h2>Implementation Timeline</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 1</div>
+                    <div class="timeline-content">
+                        <h4>Discovery & Setup</h4>
+                        <p>Kickoff call, account access, tracking setup, strategy alignment</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 2</div>
+                    <div class="timeline-content">
+                        <h4>Strategy & Creative</h4>
+                        <p>Campaign structure, keyword research, ad copy development</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 3</div>
+                    <div class="timeline-content">
+                        <h4>Launch & Optimize</h4>
+                        <p>Campaign launch, initial optimizations, performance monitoring</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-week">Ongoing</div>
+                    <div class="timeline-content">
+                        <h4>Continuous Improvement</h4>
+                        <p>Weekly optimizations, A/B testing, scaling winning campaigns</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Investment -->
+        <div class="price-section">
+            <h2>Your Investment</h2>
+            <div class="price-box">'''
+
+    if has_google_ads:
+        html += '''
+                <img src="https://mediaforce.ca/wp-content/uploads/2025/11/guide-google-ads.png" height="40" alt="Google Ads" style="background: white; padding: 10px; border-radius: 8px; margin-bottom: 20px;">'''
+
+    html += f'''
+                <div class="price">${budget:,}/month</div>
+                <div class="price-detail">
+                    Management Fee: ${management_fee:,}/mo<br>
+                    Ad Spend: ${ad_spend:,}/mo
+                </div>
+            </div>
+            <p style="opacity: 0.9; max-width: 500px; margin: 0 auto;">
+                Includes full campaign management, creative services, weekly reporting, and dedicated account support.
+            </p>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="footer">
+            <h2>Ready to Get Started?</h2>
+            <p style="margin-bottom: 25px;">Let's schedule a call to discuss your goals and answer any questions.</p>
+            <div class="contact-info">
+                <div class="contact-item">📧 jbon@mediaforce.ca</div>
+                <div class="contact-item">📞 613 265 2120</div>
+                <div class="contact-item">🌐 mediaforce.ca</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>'''
+
+    return html
+
+
 def generate_simple_preview(data):
     """Generate a simple HTML preview from form data"""
     client_name = data.get('client_name', 'Client')
