@@ -6,11 +6,20 @@ Flask-based web interface for staff to create proposals
 import os
 import json
 import secrets
+import re
 from datetime import datetime
 from functools import wraps
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
 from authlib.integrations.flask_client import OAuth
+
+# Anthropic API for AI generation
+try:
+    from anthropic import Anthropic
+    HAS_ANTHROPIC = True
+except ImportError:
+    HAS_ANTHROPIC = False
+    Anthropic = None
 
 # Import proposal generation modules (optional - for AI generation)
 try:
@@ -321,9 +330,457 @@ def parse_client_text(text):
     return data
 
 
+def build_proposal_with_ai_content(company, industry, location, budget, management_fee, ad_spend, today, ai_content, services):
+    """Build the full proposal HTML with AI-generated content"""
+
+    # Determine service badges
+    has_google_ads = any('google' in s.lower() or 'ads' in s.lower() or 'ppc' in s.lower() for s in services)
+    has_seo = any('seo' in s.lower() for s in services)
+    has_social = any('social' in s.lower() or 'facebook' in s.lower() or 'instagram' in s.lower() for s in services)
+
+    service_badges = []
+    if has_google_ads:
+        service_badges.append('<img src="https://mediaforce.ca/wp-content/uploads/2025/11/guide-google-ads.png" height="30" alt="Google Ads" style="margin-right: 10px;">')
+    if has_seo:
+        service_badges.append('<span style="background: #0e5881; color: white; padding: 5px 12px; border-radius: 4px; font-size: 12px; margin-right: 10px;">SEO</span>')
+    if has_social:
+        service_badges.append('<span style="background: #0e5881; color: white; padding: 5px 12px; border-radius: 4px; font-size: 12px;">Social</span>')
+
+    html = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Marketing Proposal - {company}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 11pt;
+            line-height: 1.7;
+            color: #333;
+            background: #fff;
+        }}
+        .container {{ max-width: 900px; margin: 0 auto; padding: 0; }}
+
+        /* Cover */
+        .cover {{
+            background: linear-gradient(135deg, #0e5881 0%, #0a4563 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }}
+        .cover img {{ height: 60px; margin-bottom: 30px; }}
+        .cover h1 {{ font-size: 2.5rem; font-weight: 700; margin-bottom: 15px; }}
+        .cover .subtitle {{ font-size: 1.3rem; opacity: 0.95; margin-bottom: 10px; }}
+        .cover .date {{ font-size: 0.95rem; opacity: 0.8; margin-top: 30px; }}
+        .cover .services {{ margin-top: 25px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px; }}
+
+        /* Sections */
+        .section {{ padding: 50px 40px; }}
+        .section-alt {{ background: #f8f9fa; }}
+        .section-blue {{ background: #e8f4fc; }}
+        .section h2 {{
+            color: #0e5881;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #ffcc33;
+        }}
+        .section h3 {{ color: #0e5881; font-size: 1.2rem; margin: 25px 0 15px; }}
+        .section h4 {{ color: #0e5881; font-size: 1rem; margin: 20px 0 10px; }}
+        .section p {{ margin-bottom: 15px; }}
+        .section ul {{ padding-left: 25px; margin-bottom: 15px; }}
+        .section li {{ margin: 8px 0; }}
+
+        /* Info Box */
+        .info-box {{
+            background: #e8f4fc;
+            border-left: 4px solid #0e5881;
+            padding: 20px 25px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }}
+        .info-box h4 {{ color: #0e5881; margin-top: 0; margin-bottom: 12px; }}
+
+        .success-box {{
+            background: #e8f5e9;
+            border-left: 4px solid #28a745;
+            padding: 20px 25px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }}
+        .success-box h4 {{ color: #28a745; margin-top: 0; margin-bottom: 12px; }}
+
+        .warning-box {{
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 20px 25px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }}
+        .warning-box h4 {{ color: #e65100; margin-top: 0; margin-bottom: 12px; }}
+
+        /* Cards */
+        .card-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }}
+        .card {{
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e0e0e0;
+        }}
+        .card h4 {{ color: #0e5881; margin-top: 0; margin-bottom: 12px; font-size: 1.05rem; }}
+        .card ul {{ padding-left: 18px; }}
+        .card li {{ margin: 6px 0; font-size: 0.95rem; }}
+        .card p {{ font-size: 0.95rem; margin-bottom: 10px; }}
+
+        /* Price Section */
+        .price-section {{
+            background: linear-gradient(135deg, #0e5881 0%, #0a4563 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }}
+        .price-section h2 {{ color: white; border-bottom-color: #ffcc33; display: inline-block; }}
+        .price-box {{
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 35px;
+            margin: 35px auto;
+            max-width: 500px;
+        }}
+        .price {{ font-size: 3.5rem; font-weight: 700; color: #ffcc33; }}
+        .price-detail {{ margin-top: 15px; opacity: 0.95; font-size: 1.05rem; }}
+
+        /* Timeline */
+        .timeline {{ margin: 25px 0; }}
+        .timeline-item {{
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }}
+        .timeline-week {{
+            background: #0e5881;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-width: 90px;
+            text-align: center;
+            margin-right: 20px;
+        }}
+        .timeline-content {{ flex: 1; }}
+        .timeline-content h4 {{ color: #0e5881; margin-bottom: 8px; margin-top: 0; }}
+
+        /* Footer */
+        .footer {{
+            background: #0e5881;
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+        }}
+        .footer h2 {{ color: white; border: none; margin-bottom: 20px; }}
+        .contact-info {{
+            display: flex;
+            justify-content: center;
+            gap: 35px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }}
+        .contact-item {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.05rem;
+        }}
+
+        /* Mobile */
+        @media (max-width: 768px) {{
+            .cover {{ padding: 50px 25px; }}
+            .cover h1 {{ font-size: 1.8rem; }}
+            .section {{ padding: 35px 25px; }}
+            .card-grid {{ grid-template-columns: 1fr; }}
+            .price {{ font-size: 2.5rem; }}
+            .contact-info {{ flex-direction: column; gap: 15px; }}
+            .timeline-item {{ flex-direction: column; }}
+            .timeline-week {{ margin-bottom: 10px; }}
+        }}
+
+        @media print {{
+            .section {{ page-break-inside: avoid; }}
+            .price-section {{ page-break-before: always; }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Cover -->
+        <div class="cover">
+            <img src="https://mediaforce.ca/wp-content/uploads/2025/10/mf-logo2.png" alt="Mediaforce">
+            <h1>Digital Marketing Proposal</h1>
+            <div class="subtitle">Prepared for {company}</div>
+            <div class="services">{''.join(service_badges)}</div>
+            <div class="date">{today}</div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="section">
+            <h2>Executive Summary</h2>
+            {extract_section(ai_content, 'EXECUTIVE SUMMARY', 'UNDERSTANDING YOUR BUSINESS')}
+        </div>
+
+        <!-- Understanding Your Business -->
+        <div class="section section-alt">
+            <h2>Understanding Your Business</h2>
+            {extract_section(ai_content, 'UNDERSTANDING YOUR BUSINESS', 'YOUR GOALS')}
+        </div>
+
+        <!-- Goals & Vision -->
+        <div class="section">
+            <h2>Your Goals & Vision for Success</h2>
+            {extract_section(ai_content, 'YOUR GOALS', 'OUR STRATEGY')}
+        </div>
+
+        <!-- Strategy -->
+        <div class="section section-blue">
+            <h2>Our Strategy & Approach</h2>
+            {extract_section(ai_content, 'OUR STRATEGY', 'IMPLEMENTATION')}
+        </div>
+
+        <!-- Timeline -->
+        <div class="section">
+            <h2>Implementation Timeline</h2>
+            {extract_section(ai_content, 'IMPLEMENTATION', 'INVESTMENT')}
+        </div>
+
+        <!-- Investment -->
+        <div class="price-section">
+            <h2>Your Investment</h2>
+            <div class="price-box">
+                {''.join(service_badges)}
+                <div class="price" style="margin-top: 20px;">${budget:,}/month</div>
+                <div class="price-detail">
+                    Management Fee: ${management_fee:,}/mo | Ad Spend: ${ad_spend:,}/mo
+                </div>
+            </div>
+            {extract_section(ai_content, 'INVESTMENT', 'NEXT STEPS')}
+        </div>
+
+        <!-- Next Steps -->
+        <div class="footer">
+            <h2>Ready to Get Started?</h2>
+            {extract_section(ai_content, 'NEXT STEPS', None)}
+            <div class="contact-info">
+                <div class="contact-item">📧 jbon@mediaforce.ca</div>
+                <div class="contact-item">📞 613 265 2120</div>
+                <div class="contact-item">🌐 mediaforce.ca</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>'''
+
+    return html
+
+
+def extract_section(content, start_marker, end_marker):
+    """Extract a section from AI-generated content between markers"""
+    if not content:
+        return '<p>Content generation in progress...</p>'
+
+    # Try to find section by comment markers
+    start_pattern = f'<!-- SECTION: {start_marker}'
+    start_idx = content.find(start_pattern)
+
+    if start_idx == -1:
+        # Try alternate patterns
+        start_pattern = f'<!-- {start_marker}'
+        start_idx = content.find(start_pattern)
+
+    if start_idx == -1:
+        # Try finding by section header
+        start_pattern = start_marker.replace('_', ' ').title()
+        start_idx = content.lower().find(start_marker.lower().replace('_', ' '))
+
+    if start_idx == -1:
+        return '<p>Section content not available.</p>'
+
+    # Find end of section
+    if end_marker:
+        end_pattern = f'<!-- SECTION: {end_marker}'
+        end_idx = content.find(end_pattern, start_idx + len(start_pattern))
+        if end_idx == -1:
+            end_pattern = f'<!-- {end_marker}'
+            end_idx = content.find(end_pattern, start_idx + len(start_pattern))
+        if end_idx == -1:
+            end_idx = content.lower().find(end_marker.lower().replace('_', ' '), start_idx + 50)
+    else:
+        end_idx = len(content)
+
+    if end_idx == -1:
+        end_idx = len(content)
+
+    # Extract and clean the section
+    section = content[start_idx:end_idx]
+
+    # Remove the comment marker if present
+    section = re.sub(r'<!--[^>]*-->', '', section)
+    section = section.strip()
+
+    # If section starts with a header matching the section name, remove it (we add our own h2)
+    section = re.sub(r'^<h[23][^>]*>[^<]*</h[23]>\s*', '', section, flags=re.IGNORECASE)
+
+    return section if section else '<p>Section content not available.</p>'
+
+
+def generate_ai_proposal(text, data):
+    """Use Claude API to generate rich proposal content"""
+    if not HAS_ANTHROPIC:
+        return None
+
+    api_key = os.environ.get('ANTHROPIC_API_KEY')
+    if not api_key:
+        return None
+
+    client = Anthropic(api_key=api_key)
+
+    company = data['company'] or 'the client'
+    industry = data['industry'] or 'their industry'
+    location = data['location'] or ''
+    challenges = data['challenges'] or ['increase online visibility', 'generate more leads']
+    goals = data['goals'] or ['grow website traffic', 'increase qualified leads']
+    budget = data['budget_num']
+    services = data['services']
+
+    # Build services string
+    services_str = ', '.join(services) if services else 'Google Ads and SEO'
+
+    system_message = """You are an expert digital marketing strategist writing proposals for Mediaforce, a Canadian digital marketing agency. Generate professional, persuasive, detailed proposal content.
+
+Your writing style:
+- Confident and authoritative but not arrogant
+- Data-driven and specific
+- Client-focused (emphasize their success)
+- Use concrete examples and specific tactics
+- Professional but engaging tone
+
+Output clean HTML with these allowed tags only: p, h3, h4, ul, li, strong, em, div
+Use these CSS classes: info-box, card-grid, card, success-box, warning-box"""
+
+    prompt = f"""Generate a complete digital marketing proposal for:
+
+**Client:** {company}
+**Industry:** {industry}
+**Location:** {location}
+**Budget:** ${budget:,}/month
+**Services Needed:** {services_str}
+
+**Their Challenges:**
+{chr(10).join('- ' + c for c in challenges)}
+
+**Their Goals:**
+{chr(10).join('- ' + g for g in goals)}
+
+**Original Client Brief:**
+{text}
+
+Generate the following sections with rich, specific, persuasive content (output raw HTML):
+
+1. EXECUTIVE SUMMARY (100-150 words)
+- Opening paragraph positioning the client
+- Info-box with "This Proposal Delivers:" containing 5-6 bullet points of outcomes
+
+2. UNDERSTANDING YOUR BUSINESS (200-250 words)
+- Their current situation and challenges
+- Card grid with 3 challenge cards
+- Target audience description
+
+3. YOUR GOALS & VISION (150-200 words)
+- Two cards: Short-term goals (3-6 months) and Long-term vision (1-3 years)
+- Each with 4-5 specific bullet points
+
+4. OUR STRATEGY & APPROACH (300-400 words)
+- Platform recommendation (why Google Ads/SEO/Social works for them)
+- Card grid with service-specific tactics:
+  - If Google Ads: keyword strategy, ad types, targeting approach
+  - If SEO: technical SEO, content strategy, local SEO
+  - If Social: platform selection, audience targeting, creative approach
+- Campaign structure overview
+
+5. IMPLEMENTATION TIMELINE (100-150 words)
+- 4 timeline items: Week 1, Week 2, Week 3, Ongoing
+- Each with title and 2-3 bullet points
+
+6. INVESTMENT & ROI (150-200 words)
+Based on ${budget:,}/month total:
+- Management fee: ${min(899, budget//3)}/month
+- Ad spend: ${budget - min(899, budget//3)}/month
+- What's included (5-6 bullet points)
+- Why this investment makes sense
+
+7. NEXT STEPS (100 words)
+- 3 steps to get started
+- Contact call-to-action
+
+Output each section with a clear HTML comment like <!-- SECTION: EXECUTIVE SUMMARY --> before each section.
+Make the content specific to {company} and {industry}. Reference their actual challenges and goals.
+Be persuasive about why Mediaforce is the right partner."""
+
+    try:
+        response = client.messages.create(
+            model="claude-sonnet-4-5-20250929",
+            max_tokens=8000,
+            system=system_message,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        return response.content[0].text
+    except Exception as e:
+        print(f"AI generation error: {e}")
+        return None
+
+
 def generate_proposal_from_text(text):
     """Generate full BMW-style proposal HTML from parsed text"""
     data = parse_client_text(text)
+
+    # Try AI generation first
+    ai_content = generate_ai_proposal(text, data)
+
+    company = data['company'] or 'Your Company'
+    industry = data['industry'] or 'Your Industry'
+    location = data['location'] or ''
+    challenges = data['challenges'] or ['Increase online visibility', 'Generate more leads', 'Improve conversion rates']
+    goals = data['goals'] or ['Grow website traffic', 'Increase qualified leads', 'Boost revenue']
+    budget = data['budget_num']
+    services = data['services']
+
+    # Calculate pricing
+    management_fee = min(899, budget // 3) if budget > 1500 else 499
+    ad_spend = budget - management_fee
+
+    today = datetime.now().strftime('%B %d, %Y')
+
+    # If AI content was generated, use it
+    if ai_content:
+        return build_proposal_with_ai_content(company, industry, location, budget, management_fee, ad_spend, today, ai_content, services)
+
+    # Fallback to template-based generation
+    data['company'] = company
+    data['industry'] = industry
+    data['location'] = location
+    data['challenges'] = challenges
+    data['goals'] = goals
+    data['budget_num'] = budget
+    data['services'] = services
 
     company = data['company'] or 'Your Company'
     industry = data['industry'] or 'Your Industry'
