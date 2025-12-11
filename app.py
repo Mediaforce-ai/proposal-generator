@@ -72,6 +72,15 @@ def is_allowed_user(email):
 @app.route('/')
 def index():
     """Landing page"""
+    # Auto-login if SKIP_AUTH is enabled
+    if os.environ.get('SKIP_AUTH', '').lower() == 'true':
+        if 'user' not in session:
+            session['user'] = {
+                'email': 'staff@mediaforce.ca',
+                'name': 'Mediaforce Staff'
+            }
+        return redirect(url_for('dashboard'))
+
     if 'user' in session:
         return redirect(url_for('dashboard'))
     return render_template('web/index.html')
