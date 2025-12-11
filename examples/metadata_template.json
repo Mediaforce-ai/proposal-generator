@@ -1,0 +1,200 @@
+{
+  "$schema": "Mediaforce Digital Marketing Proposal Schema v1.1 (Updated 2025-11-04)",
+  "_comments": {
+    "version_notes": "v1.1 changes: 3-week timeline, simplified color scheme, card-based layouts with icons throughout",
+    "timeline": "Timeline now uses 3 weeks (week_1, week_2, week_3, weeks_4_12) with launch in week 3",
+    "colors": "Only info-box (light blue) and cards (light gray) used - no yellow/green/orange backgrounds",
+    "target_audience": "Three horizontal cards with icons: 👥 Demographics, 🎯 Psychographics & Behaviors, 🔍 Search Behavior",
+    "vision_for_success": "Two side-by-side cards: 🎯 Short-Term Goals (3-6 months), 🚀 Long-Term Vision (1-3 years)",
+    "creative_services": "Icons for visual clarity: 🎨 Google Ads Creative, 📄 Landing Pages, 📊 Ongoing Optimization",
+    "investment_overview": "Google Ads logo (150px) in white rounded box (border-radius: 12px) at top of price-box",
+    "footer_logos": "Partner platform logos (footer-logos.png) at bottom of proposal above footer for credibility",
+    "contact_section": "Streamlined inline design with icons (📧 📞 🌐) - 70% less space than v1.0",
+    "seasonal_icons": "Use ❄️ for winter, 🏖️ for summer, 🎃 for fall, 🎄 for Christmas",
+    "contact_phone": "Standard phone: 613 265 2120"
+  },
+  "metadata": {
+    "client_name": "Client Company Name",
+    "proposal_date": "2025-11-04",
+    "analyst": "The Mediaforce Team",
+    "proposal_type": "Digital Marketing Strategy Proposal"
+  },
+  "client_context": {
+    "industry": "Luxury Automotive",
+    "brands": ["BMW", "MINI", "BMW Motorrad"],
+    "location": "Greater Toronto Area",
+    "current_situation": {
+      "description": "Brief description of client's current state",
+      "pain_points": [
+        "Pain point 1",
+        "Pain point 2",
+        "Pain point 3"
+      ]
+    },
+    "success_definition": {
+      "short_term": [
+        "Success metric 1 (3-6 months)",
+        "Success metric 2 (3-6 months)"
+      ],
+      "long_term": [
+        "Success metric 1 (1-3 years)",
+        "Success metric 2 (1-3 years)"
+      ]
+    },
+    "target_audience": {
+      "demographics": ["demo 1", "demo 2"],
+      "psychographics": ["psycho 1", "psycho 2"],
+      "behaviors": ["behavior 1", "behavior 2"]
+    }
+  },
+  "competitive_landscape": {
+    "market_overview": "Description of the competitive landscape",
+    "competitors": [
+      {
+        "name": "Competitor 1",
+        "strengths": ["strength 1", "strength 2"],
+        "weaknesses": ["weakness 1", "weakness 2"]
+      }
+    ],
+    "opportunities": [
+      "Opportunity 1",
+      "Opportunity 2"
+    ]
+  },
+  "strategy": {
+    "pillars": {
+      "google_ads": {
+        "enabled": true,
+        "monthly_budget": 14000,
+        "campaigns": [
+          {
+            "name": "Branded Search",
+            "budget": 3000,
+            "description": "Campaign description"
+          }
+        ],
+        "tactics": ["tactic 1", "tactic 2"],
+        "expected_results": {
+          "timeframe": "90 days",
+          "metrics": ["metric 1", "metric 2"]
+        }
+      },
+      "seo": {
+        "enabled": true,
+        "focus_areas": ["Local SEO", "On-Page SEO", "Off-Page SEO"],
+        "tactics": ["tactic 1", "tactic 2"],
+        "expected_results": {
+          "timeframe": "3-6 months",
+          "metrics": ["metric 1", "metric 2"]
+        }
+      },
+      "paid_social": {
+        "enabled": true,
+        "monthly_budget": 10000,
+        "platforms": ["Meta", "Instagram"],
+        "campaigns": ["campaign 1", "campaign 2"],
+        "tactics": ["tactic 1", "tactic 2"],
+        "expected_results": {
+          "timeframe": "90 days",
+          "metrics": ["metric 1", "metric 2"]
+        }
+      }
+    },
+    "creative_services": {
+      "google_ads": ["Ad copy", "Landing pages"],
+      "social_media": ["Carousel ads", "Video content"],
+      "landing_pages": ["Design", "Development"]
+    }
+  },
+  "success_metrics": {
+    "primary_kpis": [
+      "Website traffic",
+      "Lead volume",
+      "Cost per lead",
+      "Conversion rate"
+    ],
+    "reporting": {
+      "real_time_dashboard": true,
+      "weekly_updates": true,
+      "monthly_strategy_sessions": true,
+      "quarterly_reviews": true
+    },
+    "projections": {
+      "month_1_3": {
+        "website_visits": "X-Y per month",
+        "leads": "X-Y per month",
+        "cost_per_lead": "$X-Y"
+      },
+      "month_4_6": {
+        "website_visits": "X-Y per month",
+        "leads": "X-Y per month",
+        "cost_per_lead": "$X-Y"
+      },
+      "month_7_12": {
+        "website_visits": "X-Y per month",
+        "leads": "X-Y per month",
+        "cost_per_lead": "$X-Y"
+      }
+    },
+    "roi_example": {
+      "monthly_investment": 25000,
+      "avg_deal_value": 5000,
+      "closing_rate": 0.30,
+      "monthly_revenue": 150000,
+      "roi_multiple": "6.0x"
+    }
+  },
+  "timeline": {
+    "week_1": {
+      "title": "Onboarding & Discovery",
+      "deliverables": ["deliverable 1", "deliverable 2", "deliverable 3"]
+    },
+    "week_2": {
+      "title": "Campaign Strategy & Build",
+      "deliverables": ["deliverable 1", "deliverable 2", "deliverable 3"]
+    },
+    "week_3": {
+      "title": "Final QA & Campaign Launch",
+      "deliverables": ["deliverable 1", "deliverable 2", "deliverable 3", "Campaign launch"]
+    },
+    "weeks_4_12": {
+      "title": "Optimization & Scaling",
+      "deliverables": ["deliverable 1", "deliverable 2", "deliverable 3"]
+    }
+  },
+  "investment": {
+    "packages": [
+      {
+        "name": "COMPLETE PACKAGE",
+        "description": "Full digital marketing management",
+        "monthly_retainer": 25000,
+        "ad_spend": 24000,
+        "total_monthly": 49000,
+        "includes": [
+          "Strategy & Planning",
+          "Campaign Management",
+          "Creative Services",
+          "Analytics & Reporting"
+        ]
+      }
+    ],
+    "payment_terms": {
+      "retainer": "Monthly",
+      "ad_spend": "Direct to platforms",
+      "contract_length": "6 months minimum"
+    }
+  },
+  "next_steps": {
+    "process": [
+      "Schedule discovery call",
+      "Sign agreement",
+      "Begin onboarding"
+    ],
+    "contact": {
+      "name": "Mediaforce Team",
+      "email": "jbon@mediaforce.ca",
+      "phone": "613 265 2120",
+      "website": "mediaforce.ca"
+    }
+  }
+}

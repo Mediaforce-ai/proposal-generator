@@ -1,0 +1,272 @@
+{
+  "$schema": "Mediaforce Proposal Generator Preferences v1.2",
+  "version": "1.2",
+  "last_updated": "2025-11-05",
+
+  "branding": {
+    "primary_color": "#0e5881",
+    "secondary_color": "#ffcc33",
+    "dark_gradient": "#0a4563",
+    "brand_focus": "Blue primary + Gold accents only"
+  },
+
+  "color_scheme": {
+    "background_colors": {
+      "info_box": "#e8f4f8",
+      "cards": "#f9f9f9",
+      "body": "#ffffff"
+    },
+    "text_colors": {
+      "primary": "#333333",
+      "white": "#ffffff"
+    },
+    "borders": {
+      "info_box_left": "#0e5881",
+      "card_left": "#ffcc33"
+    },
+    "philosophy": "Only 2 background colors (light blue for info-box, light gray for cards). No yellow, green, or orange backgrounds. Simplified for brand consistency."
+  },
+
+  "typography": {
+    "font_family": "Segoe UI, Tahoma, Geneva, Verdana, sans-serif",
+    "body_size": "11pt",
+    "line_height": "1.6",
+    "headings": {
+      "h1": "32pt",
+      "h2": "18pt",
+      "h3": "16pt",
+      "h4": "13pt"
+    },
+    "contact_info_size": "13pt"
+  },
+
+  "timeline": {
+    "structure": "3-week accelerated launch",
+    "phases": ["week_1", "week_2", "week_3", "weeks_4_12"],
+    "campaign_launch": "week_3",
+    "rationale": "Faster time-to-market for seasonal urgency and competitive markets"
+  },
+
+  "section_layouts": {
+    "target_audience": {
+      "layout": "three horizontal cards",
+      "icons": {
+        "demographics": "👥",
+        "psychographics_behaviors": "🎯",
+        "search_behavior": "🔍"
+      },
+      "no_image": true,
+      "card_based": true
+    },
+
+    "vision_for_success": {
+      "layout": "two side-by-side cards",
+      "icons": {
+        "short_term": "🎯",
+        "long_term": "🚀"
+      },
+      "card_based": true
+    },
+
+    "creative_services": {
+      "icons": {
+        "google_ads_creative": "🎨",
+        "landing_pages": "📄",
+        "ongoing_optimization": "📊"
+      }
+    },
+
+    "contact_section": {
+      "layout": "streamlined inline",
+      "icons": {
+        "email": "📧",
+        "phone": "📞",
+        "website": "🌐"
+      },
+      "space_efficiency": "70% less vertical space than v1.0"
+    },
+
+    "investment_overview": {
+      "logo": {
+        "enabled": true,
+        "source": "https://mediaforce.ca/wp-content/uploads/2025/11/guide-google-ads.png",
+        "width": "150px",
+        "container": {
+          "background": "white",
+          "border_radius": "12px",
+          "padding": "20px",
+          "display": "inline-block"
+        },
+        "placement": "top of price-box",
+        "note": "Use platform-specific logo (Google Ads, Meta, LinkedIn) or Mediaforce logo for multi-platform"
+      }
+    },
+
+    "footer_logos": {
+      "enabled": true,
+      "source": "https://mediaforce.ca/wp-content/uploads/2025/11/footer-logos.png",
+      "alt": "Partner Platforms",
+      "max_width": "100%",
+      "margin": "40px 0 20px 0",
+      "placement": "end of Next Steps section, above footer",
+      "purpose": "Showcase multi-platform expertise and credibility"
+    }
+  },
+
+  "seasonal_icons": {
+    "winter": "❄️",
+    "summer": "🏖️",
+    "fall": "🎃",
+    "christmas": "🎄",
+    "usage": "Use in Peak Season Readiness sections for seasonal urgency"
+  },
+
+  "official_assets": {
+    "mediaforce_logo": "https://mediaforce.ca/wp-content/uploads/2025/10/mf-logo2.png",
+    "mediaforce_logo_usage": "Use image logo in header (60px height), not text 'MEDIAFORCE'",
+    "google_ads_logo": "https://mediaforce.ca/wp-content/uploads/2025/11/guide-google-ads.png",
+    "footer_logos": "https://mediaforce.ca/wp-content/uploads/2025/11/footer-logos.png",
+    "target_audience_image": "DEPRECATED - Use three cards with icons instead"
+  },
+
+  "contact_information": {
+    "standard_phone": "613 265 2120",
+    "email": "jbon@mediaforce.ca",
+    "website": "mediaforce.ca",
+    "display_format": "inline with icons and pipe separators"
+  },
+
+  "pricing_defaults": {
+    "google_ads_management": {
+      "default_monthly_fee": 899,
+      "currency": "USD",
+      "note": "Typical range: $899-$1,200/month depending on ad spend and complexity"
+    },
+    "seo_management": {
+      "default_monthly_fee": 1100,
+      "currency": "USD",
+      "terminology": "AI-friendly SEO (not just 'SEO' or 'Organic Growth')",
+      "note": "Typical range: $950-$1,500/month depending on scope"
+    },
+    "recommended_ad_spend": {
+      "default": 1500,
+      "currency": "USD",
+      "display_format": "Single value (e.g., $1,500/month), not ranges"
+    },
+    "setup_fees": {
+      "default": 1500,
+      "original_price": 2500,
+      "display_format": "Show discount with strikethrough: <s>$2,500</s> $1,500",
+      "note": "Always show original price struck through to demonstrate value"
+    },
+    "fee_breakdown": {
+      "display_style": "separate_line_items",
+      "structure": {
+        "management_fees_box": "Light background container with individual line items",
+        "google_ads": "Separate line item",
+        "seo": "Separate line item",
+        "total_management": "Subtotal line with border-top separator",
+        "ad_spend": "Separate line below management fees",
+        "total_investment": "Highlighted with background color for emphasis"
+      }
+    }
+  },
+
+  "seo_terminology": {
+    "preferred_term": "AI-friendly SEO",
+    "avoid_terms": ["SEO (Organic Growth)", "Traditional SEO", "Standard SEO"],
+    "section_title": "Channel 2: AI-friendly SEO",
+    "description": "Optimized for both Google search and AI platform recommendations",
+    "platforms": ["ChatGPT", "Claude", "Perplexity", "Gemini"],
+    "key_components": [
+      "Entity Recognition Optimization",
+      "Authoritative Content Creation",
+      "Citation-Worthy Information",
+      "Structured Data Implementation (JSON-LD schema)",
+      "Topic Authority Building",
+      "Natural Language Optimization"
+    ],
+    "ai_platform_section": {
+      "required": true,
+      "icon": "🤖",
+      "title": "AI Platform Optimization: Get Recommended by ChatGPT, Claude & Perplexity",
+      "styling": "info-box with light blue background (never purple or other colors)",
+      "placement": "Immediately after section title, before technical SEO details",
+      "emphasis_color": "#0e5881",
+      "key_message": "When prospects ask AI platforms for bookkeeping/service recommendations, client will be mentioned"
+    }
+  },
+
+  "component_guidelines": {
+    "info_box": {
+      "background": "#e8f4f8",
+      "border_left": "4px solid #0e5881",
+      "usage": "Highlighted sections, key information, recommendations"
+    },
+    "card": {
+      "background": "#f9f9f9",
+      "border_left": "4px solid #ffcc33",
+      "usage": "Grouped content, features, service items"
+    },
+    "card_grid": {
+      "display": "grid",
+      "columns": "auto-fit, minmax(280px, 1fr)",
+      "gap": "20px",
+      "mobile_behavior": "stacks vertically below 768px"
+    },
+    "price_box": {
+      "background": "linear-gradient(135deg, #0e5881 0%, #0a4563 100%)",
+      "color": "white",
+      "usage": "Investment/pricing sections"
+    }
+  },
+
+  "design_principles": {
+    "color_philosophy": "Blue + Gold only for brand consistency",
+    "icon_usage": "Use emoji icons to enhance visual hierarchy",
+    "space_efficiency": "Minimize vertical space, maximize readability",
+    "layout_system": "Card-based layout for organized content",
+    "responsive_design": "Mobile-first approach with 768px breakpoint",
+    "contrast_rules": {
+      "dark_backgrounds": "Use white text (#ffffff)",
+      "light_backgrounds": "Use dark text (#333333)"
+    }
+  },
+
+  "version_history": {
+    "v1.2": {
+      "date": "2025-11-05",
+      "major_changes": [
+        "Pricing defaults: Google Ads $899/mo, SEO $1,100/mo, Ad Spend $1,500/mo",
+        "Setup fee: $1,500 (with $2,500 struck through)",
+        "Management fee breakout: Separate line items for Google Ads and SEO",
+        "AI-friendly SEO terminology (replaces 'SEO' or 'Organic Growth')",
+        "AI Platform Optimization section required in all SEO proposals",
+        "Header logo: Image logo (60px height) instead of text",
+        "Color scheme enforcement: Light blue info-box only (no purple, no custom gradients)"
+      ]
+    },
+    "v1.1": {
+      "date": "2025-11-04",
+      "major_changes": [
+        "3-week timeline (25% faster)",
+        "Simplified to 2 background colors (60% reduction)",
+        "Target audience: three cards with icons",
+        "Vision for Success: side-by-side cards",
+        "Creative Services: icons added",
+        "Contact section: 70% less space",
+        "Investment: Google Ads logo in white rounded box",
+        "Footer: partner platform logos"
+      ]
+    },
+    "v1.0": {
+      "date": "2025-10-xx",
+      "features": [
+        "4-week timeline",
+        "5 background colors",
+        "Target audience with image",
+        "Stacked vision for success lists"
+      ]
+    }
+  }
+}

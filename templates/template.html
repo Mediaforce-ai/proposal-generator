@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{CLIENT}} - Digital Marketing Proposal - Mediaforce</title>
+    <link rel="stylesheet" href="proposal.css">
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for navigation links
+            document.querySelectorAll('.nav-menu-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    if (targetSection) {
+                        const navHeight = document.querySelector('.nav-menu').offsetHeight;
+                        const targetPosition = targetSection.offsetTop - navHeight - 10;
+                        window.scrollTo({top: targetPosition, behavior: 'smooth'});
+                        document.getElementById('navMenu').classList.remove('active');
+                    }
+                });
+            });
+
+            // Mobile menu toggle
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.getElementById('navMenu');
+            if (navToggle) {
+                navToggle.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                });
+            }
+
+            // Highlight active section
+            const sections = document.querySelectorAll('.section[id]');
+            const navLinks = document.querySelectorAll('.nav-menu-link');
+            function highlightNavigation() {
+                const scrollPosition = window.scrollY + 100;
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    const sectionId = section.getAttribute('id');
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${sectionId}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }
+            window.addEventListener('scroll', highlightNavigation);
+            highlightNavigation();
+        });
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-container">
+            <img src="https://mediaforce.ca/wp-content/uploads/2025/10/mf-logo2.png" alt="Mediaforce" style="max-width: 250px; height: auto;">
+        </div>
+        <div class="header-info">
+            <h1>{{PROPOSAL_TYPE}}</h1>
+            <p><strong>{{ANALYST}}</strong> | Lead Strategist & Founder</p>
+            <p>jbon@mediaforce.ca | (647) 555-0123</p>
+        </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="nav-menu">
+        <div class="nav-container">
+            <ul class="nav-menu-items" id="navMenu">
+                <li class="nav-menu-item"><a href="#executive-summary" class="nav-menu-link">Executive Summary</a></li>
+                <li class="nav-menu-item"><a href="#your-business" class="nav-menu-link">Your Business</a></li>
+                <li class="nav-menu-item"><a href="#competitive-analysis" class="nav-menu-link">Competition</a></li>
+                <li class="nav-menu-item"><a href="#our-approach" class="nav-menu-link">Our Approach</a></li>
+                <li class="nav-menu-item"><a href="#success-metrics" class="nav-menu-link">Metrics & ROI</a></li>
+                <li class="nav-menu-item"><a href="#timeline" class="nav-menu-link">Timeline</a></li>
+                <li class="nav-menu-item"><a href="#investment" class="nav-menu-link">Investment</a></li>
+                <li class="nav-menu-item"><a href="#next-steps" class="nav-menu-link">Next Steps</a></li>
+            </ul>
+            <button class="nav-menu-toggle" id="navToggle">☰</button>
+        </div>
+    </nav>
+
+    <!-- Cover Section -->
+    <div class="cover">
+        <h1 style="text-shadow: 3px 3px 6px rgba(0,0,0,0.3);">{{CLIENT}}</h1>
+        <h2>
+            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            {{PROPOSAL_TYPE}}
+        </h2>
+        <div style="margin-top: 15px;">
+            <span class="badge" style="background: rgba(255,255,255,0.95); color: #0e5881; font-size: 10pt;">Digital Marketing</span>
+            <span class="badge" style="background: rgba(255,255,255,0.95); color: #0e5881; font-size: 10pt;">Performance-Driven</span>
+        </div>
+        <div class="meta">
+            <div class="meta-item"><strong>Prepared By</strong><span>Mediaforce</span></div>
+            <div class="meta-item"><strong>Date</strong><span>{{PROPOSAL_DATE}}</span></div>
+            <div class="meta-item"><strong>Status</strong><span>Confidential</span></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Executive Summary -->
+        <div class="section" id="executive-summary">
+            <h2>
+                <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                Executive Summary
+            </h2>
+            <!-- SLOT: EXECUTIVE_SUMMARY -->
+        </div>
+
+        <!-- Your Business -->
+        <div class="section" id="your-business">
+            <h2>
+                <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                Understanding Your Business & Challenges
+            </h2>
+            <!-- SLOT: YOUR_BUSINESS -->
+        </div>
+
+        <!-- Competitive Analysis -->
+        <div class="section" id="competitive-analysis">
+            <h2>
+                <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="6"/>
+                    <circle cx="12" cy="12" r="2"/>
+                </svg>
+                Competitive Analysis
+            </h2>
+            <!-- SLOT: COMPETITIVE_ANALYSIS -->
+        </div>
+
+        <!-- Our Approach -->
+        <div class="section" id="our-approach">
+            <h2>
+                <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/>
+                </svg>
+                Our Approach & Strategy
+            </h2>
+            <!-- SLOT: STRATEGY -->
+        </div>
+
+        <!-- Success Metrics -->
+        <div class="section" id="success-metrics">
+            <h2>
+                <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                Success Metrics & ROI
+            </h2>
+            <!-- SLOT: SUCCESS_METRICS -->
+        </div>
+
+        <!-- Timeline -->
+        <div class="section" id="timeline">
+            <h2>
+                <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                Implementation Timeline
+            </h2>
+            <!-- SLOT: TIMELINE -->
+        </div>
+
+        <!-- Investment -->
+        <div class="section" id="investment">
+            <h2>
+                <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Investment
+            </h2>
+            <!-- SLOT: INVESTMENT -->
+        </div>
+
+        <!-- Next Steps -->
+        <div class="section" id="next-steps">
+            <h2>
+                <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5l7 7-7 7"/>
+                </svg>
+                Next Steps
+            </h2>
+            <!-- SLOT: NEXT_STEPS -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p><strong>Proposal Reference:</strong> {{CLIENT}}-{{PROPOSAL_DATE}}</p>
+        <p><strong>Document Version:</strong> 1.0</p>
+        <p><strong>Date Prepared:</strong> {{PROPOSAL_DATE}}</p>
+        <p style="margin-top: 20px;">&copy; {{YEAR}} Mediaforce.ca | All Rights Reserved</p>
+        <p>Joe Bongiorno | jbon@mediaforce.ca | (647) 555-0123</p>
+        <p style="margin-top: 15px; font-size: 8pt; opacity: 0.8;">This proposal is confidential and intended solely for {{CLIENT}}.</p>
+        <p style="font-size: 8pt; opacity: 0.8;">All projections are estimates based on industry benchmarks and are not guaranteed results.</p>
+    </div>
+</div>
+
+</body>
+</html>
