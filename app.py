@@ -12,9 +12,15 @@ from functools import wraps
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
 from authlib.integrations.flask_client import OAuth
 
-# Import proposal generation modules
-from generator import ProposalGenerator
-from assembler import ProposalAssembler
+# Import proposal generation modules (optional - for AI generation)
+try:
+    from generator import ProposalGenerator
+    from assembler import ProposalAssembler
+    HAS_GENERATOR = True
+except ImportError:
+    HAS_GENERATOR = False
+    ProposalGenerator = None
+    ProposalAssembler = None
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
@@ -150,9 +156,11 @@ def api_generate():
     try:
         metadata = request.json
 
-        # Generate proposal using the assembler
-        assembler = ProposalAssembler()
-        html_content = assembler.generate(metadata)
+        if HAS_GENERATOR and ProposalAssembler:
+            assembler = ProposalAssembler()
+            html_content = assembler.generate(metadata)
+        else:
+            html_content = generate_simple_preview(metadata)
 
         return jsonify({
             'success': True,
@@ -171,10 +179,7 @@ def api_preview():
     """Generate a preview of the proposal"""
     try:
         metadata = request.json
-
-        # Use template-based generation for preview
-        assembler = ProposalAssembler()
-        preview_html = assembler.generate_preview(metadata)
+        preview_html = generate_simple_preview(metadata)
 
         return jsonify({
             'success': True,
@@ -185,6 +190,95 @@ def api_preview():
             'success': False,
             'error': str(e)
         }), 500
+
+
+def generate_simple_preview(data):
+    """Generate a simple HTML preview from form data"""
+    client_name = data.get('client_name', 'Client')
+    industry = data.get('industry', '')
+
+    html = f'''<!DOCTYPE html>
+<html>
+<head>
+    <title>Proposal for {client_name}</title>
+    <style>
+        body {{ font-family: 'Segoe UI', Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; color: #333; }}
+        .header {{ background: #0e5881; color: white; padding: 40px; text-align: center; margin: -40px -40px 40px; }}
+        .header h1 {{ margin: 0; font-size: 2rem; }}
+        .header p {{ margin: 10px 0 0; opacity: 0.9; }}
+        .section {{ margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 8px; }}
+        .section h2 {{ color: #0e5881; margin-top: 0; border-bottom: 2px solid #ffcc33; padding-bottom: 10px; }}
+        .info-box {{ background: #e8f4fc; padding: 15px; border-radius: 6px; margin: 15px 0; }}
+        .price-box {{ background: #0e5881; color: white; padding: 20px; border-radius: 8px; text-align: center; }}
+        .price {{ font-size: 2rem; font-weight: bold; color: #ffcc33; }}
+        ul {{ padding-left: 20px; }}
+        li {{ margin: 8px 0; }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://mediaforce.ca/wp-content/uploads/2025/10/mf-logo2.png" height="50" alt="Mediaforce">
+        <h1>Digital Marketing Proposal</h1>
+        <p>Prepared for {client_name}</p>
+    </div>
+
+    <div class="section">
+        <h2>Understanding Your Business</h2>
+        <div class="info-box">
+            <strong>Industry:</strong> {industry}<br>
+            <strong>Location:</strong> {data.get('location', 'N/A')}
+        </div>
+        <p><strong>Current Challenges:</strong></p>
+        <ul>'''
+
+    pain_points = data.get('pain_points', '').split('\n') if data.get('pain_points') else ['Increase online visibility']
+    for point in pain_points:
+        if point.strip():
+            html += f'<li>{point.strip()}</li>'
+
+    html += '''</ul>
+    </div>
+
+    <div class="section">
+        <h2>Your Goals</h2>
+        <p><strong>Short-Term (3-6 months):</strong></p>
+        <ul>'''
+
+    short_goals = data.get('short_term_goals', '').split('\n') if data.get('short_term_goals') else ['Increase traffic']
+    for goal in short_goals:
+        if goal.strip():
+            html += f'<li>{goal.strip()}</li>'
+
+    html += '''</ul>
+    </div>
+
+    <div class="section">
+        <h2>Investment</h2>
+        <div class="price-box">
+            <p>Monthly Investment</p>'''
+
+    retainer = int(data.get('monthly_retainer', 899) or 899)
+    ad_spend = int(data.get('ad_spend', 1500) or 1500)
+    total = retainer + ad_spend
+
+    html += f'''<div class="price">${total:,}/month</div>
+            <p>Management Fee: ${retainer:,} | Ad Spend: ${ad_spend:,}</p>
+        </div>
+    </div>
+
+    <div class="section" style="text-align: center;">
+        <h2>Next Steps</h2>
+        <p>Ready to get started? Contact us:</p>
+        <p>
+            <strong>Email:</strong> jbon@mediaforce.ca<br>
+            <strong>Phone:</strong> 613 265 2120<br>
+            <strong>Website:</strong> mediaforce.ca
+        </p>
+    </div>
+</body>
+</html>'''
+
+    return html
 
 
 def build_metadata_from_form(form):
