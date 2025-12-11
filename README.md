@@ -4,7 +4,76 @@ AI-powered digital marketing proposal generator that creates BMW-style professio
 
 **📋 [VERSION_SUMMARY.md](VERSION_SUMMARY.md)** - Quick reference card for v1.1 features, icons, and components
 
-## 🚀 Quick Reference
+---
+
+## 🌐 Web Application (Staff Self-Service)
+
+The proposal generator is available as a web application for Mediaforce staff.
+
+### Quick Start (Development)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Mediaforce-ai/proposal-generator.git
+cd proposal-generator
+
+# 2. Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Set up environment
+cp .env.example .env
+# Edit .env with your settings
+
+# 5. Run the app
+export FLASK_ENV=development
+python app.py
+```
+
+Open http://localhost:5000 in your browser.
+
+### Production Deployment (Docker)
+
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+
+# Or build manually
+docker build -t proposal-generator .
+docker run -p 5000:5000 --env-file .env proposal-generator
+```
+
+### Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `SECRET_KEY` | Flask secret key for sessions | Yes |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | Yes (prod) |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | Yes (prod) |
+| `ALLOWED_DOMAINS` | Comma-separated allowed email domains | No (default: mediaforce.ca) |
+| `ANTHROPIC_API_KEY` | Anthropic API key for AI generation | Optional |
+| `FLASK_ENV` | development or production | No |
+
+### Google OAuth Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create a new OAuth 2.0 Client ID
+3. Set authorized redirect URI to: `https://your-domain.com/authorize`
+4. Copy Client ID and Secret to your `.env` file
+
+### Deployment Options
+
+- **Railway**: One-click deploy with Dockerfile
+- **Vercel**: Use `vercel.json` configuration
+- **AWS/GCP**: Use Docker image with ECS/Cloud Run
+- **Self-hosted**: Use Docker Compose with Nginx reverse proxy
+
+---
+
+## 🚀 Quick Reference (CLI Usage)
 
 **For New Proposals:**
 ```bash

@@ -1,0 +1,44 @@
+{% extends "web/base.html" %}
+
+{% block title %}Dashboard - Mediaforce Proposal Generator{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Welcome, {{ user.name.split()[0] if user and user.name else 'User' }}</h1>
+        <p>Create professional digital marketing proposals for your clients</p>
+    </div>
+
+    <div class="dashboard-actions">
+        <a href="{{ url_for('create_proposal') }}" class="action-card action-card-primary">
+            <div class="action-icon">+</div>
+            <h2>Create New Proposal</h2>
+            <p>Start a new digital marketing proposal from scratch</p>
+        </a>
+
+        <div class="action-card">
+            <div class="action-icon">&#128203;</div>
+            <h2>Templates</h2>
+            <p>Use pre-built templates for common proposal types</p>
+            <span class="badge">Coming Soon</span>
+        </div>
+
+        <div class="action-card">
+            <div class="action-icon">&#128193;</div>
+            <h2>Recent Proposals</h2>
+            <p>View and edit your recent proposals</p>
+            <span class="badge">Coming Soon</span>
+        </div>
+    </div>
+
+    <div class="quick-tips">
+        <h3>Quick Tips</h3>
+        <ul>
+            <li><strong>Client Information:</strong> Have the client intake form data ready</li>
+            <li><strong>Services:</strong> Know which services to include (Google Ads, SEO, Paid Social)</li>
+            <li><strong>Budget:</strong> Confirm the client's monthly budget range</li>
+            <li><strong>Preview:</strong> Always preview before downloading the final PDF</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
