@@ -331,259 +331,635 @@ def parse_client_text(text):
 
 
 def build_proposal_with_ai_content(company, industry, location, budget, management_fee, ad_spend, today, ai_content, services):
-    """Build the full proposal HTML with AI-generated content"""
+    """Build the full proposal HTML with AI-generated content matching local template design"""
 
-    # Determine service badges
+    # Determine service badges and build service price items
     has_google_ads = any('google' in s.lower() or 'ads' in s.lower() or 'ppc' in s.lower() for s in services)
     has_seo = any('seo' in s.lower() for s in services)
-    has_social = any('social' in s.lower() or 'facebook' in s.lower() or 'instagram' in s.lower() for s in services)
+    has_social = any('social' in s.lower() or 'facebook' in s.lower() or 'instagram' in s.lower() or 'linkedin' in s.lower() for s in services)
+    has_website = any('web' in s.lower() or 'site' in s.lower() for s in services)
 
-    service_badges = []
+    # Build service-specific pricing items
+    price_items_html = ''
+    total_monthly = 0
+
     if has_google_ads:
-        service_badges.append('<img src="https://mediaforce.ca/wp-content/uploads/2025/11/guide-google-ads.png" height="30" alt="Google Ads" style="margin-right: 10px;">')
+        price_items_html += f'''
+                        <div class="price-item">
+                            <span class="label">Google Ads Management</span>
+                            <span class="amount">${management_fee:,}/month</span>
+                        </div>'''
+        total_monthly += management_fee
+
     if has_seo:
-        service_badges.append('<span style="background: #0e5881; color: white; padding: 5px 12px; border-radius: 4px; font-size: 12px; margin-right: 10px;">SEO</span>')
+        seo_fee = 1100 if budget > 2000 else 799
+        price_items_html += f'''
+                        <div class="price-item">
+                            <span class="label">SEO Management</span>
+                            <span class="amount">${seo_fee:,}/month</span>
+                        </div>'''
+        total_monthly += seo_fee
+
     if has_social:
-        service_badges.append('<span style="background: #0e5881; color: white; padding: 5px 12px; border-radius: 4px; font-size: 12px;">Social</span>')
+        social_fee = 800 if budget > 2000 else 599
+        price_items_html += f'''
+                        <div class="price-item">
+                            <span class="label">Social Media / LinkedIn Marketing</span>
+                            <span class="amount">${social_fee:,}/month</span>
+                        </div>'''
+        total_monthly += social_fee
+
+    if has_website:
+        price_items_html += '''
+                        <div class="price-item">
+                            <span class="label">Website Design & Development</span>
+                            <span class="amount">$5,000 - $15,000</span>
+                        </div>'''
+
+    # Add ad spend
+    price_items_html += f'''
+                        <div class="price-item">
+                            <span class="label">Recommended Ad Spend</span>
+                            <span class="amount">${ad_spend:,}/month</span>
+                        </div>'''
+
+    # Total line
+    total_monthly += ad_spend
+    price_items_html += f'''
+                        <div class="price-item" style="border-top: 2px solid rgba(255,204,51,0.5); padding-top: 15px; margin-top: 15px; background: rgba(255,204,51,0.15); border-radius: 8px; padding: 15px;">
+                            <span class="label" style="font-size: 14pt;">Total Monthly Investment</span>
+                            <span class="amount" style="font-size: 18pt;">${total_monthly:,}/month</span>
+                        </div>'''
+
+    # Navigation menu items
+    nav_items = '''
+                    <li class="nav-menu-item"><a href="#executive-summary" class="nav-menu-link">Executive Summary</a></li>
+                    <li class="nav-menu-item"><a href="#your-business" class="nav-menu-link">Your Business</a></li>
+                    <li class="nav-menu-item"><a href="#goals" class="nav-menu-link">Goals</a></li>
+                    <li class="nav-menu-item"><a href="#strategy" class="nav-menu-link">Strategy</a></li>
+                    <li class="nav-menu-item"><a href="#timeline" class="nav-menu-link">Timeline</a></li>
+                    <li class="nav-menu-item"><a href="#investment" class="nav-menu-link">Investment</a></li>
+                    <li class="nav-menu-item"><a href="#about-mediaforce" class="nav-menu-link">About Us</a></li>
+                    <li class="nav-menu-item"><a href="#next-steps" class="nav-menu-link">Next Steps</a></li>'''
 
     html = f'''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Marketing Proposal - {company}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>{company} - Digital Marketing Proposal - Mediaforce</title>
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 11pt;
-            line-height: 1.7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 10pt;
+            line-height: 1.6;
             color: #333;
-            background: #fff;
+            background: #f5f5f5;
+            -webkit-font-smoothing: antialiased;
         }}
-        .container {{ max-width: 900px; margin: 0 auto; padding: 0; }}
+        html {{ scroll-behavior: smooth; }}
+        .container {{
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+        }}
 
-        /* Cover */
-        .cover {{
+        /* Header */
+        .header {{
+            background: white;
+            color: #333;
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #0e5881;
+        }}
+        .logo-container {{ flex: 1; }}
+        .header-info {{ text-align: right; }}
+        .header-info h1 {{ font-size: 18pt; margin-bottom: 5px; color: #0e5881; }}
+        .header-info p {{ font-size: 9pt; color: #666; }}
+
+        /* Sticky Navigation Menu */
+        .nav-menu {{
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
             background: linear-gradient(135deg, #0e5881 0%, #0a4563 100%);
-            color: white;
-            padding: 80px 40px;
-            text-align: center;
-        }}
-        .cover img {{ height: 60px; margin-bottom: 30px; }}
-        .cover h1 {{ font-size: 2.5rem; font-weight: 700; margin-bottom: 15px; }}
-        .cover .subtitle {{ font-size: 1.3rem; opacity: 0.95; margin-bottom: 10px; }}
-        .cover .date {{ font-size: 0.95rem; opacity: 0.8; margin-top: 30px; }}
-        .cover .services {{ margin-top: 25px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px; }}
-
-        /* Sections */
-        .section {{ padding: 50px 40px; }}
-        .section-alt {{ background: #f8f9fa; }}
-        .section-blue {{ background: #e8f4fc; }}
-        .section h2 {{
-            color: #0e5881;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 25px;
-            padding-bottom: 12px;
+            z-index: 9999;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             border-bottom: 3px solid #ffcc33;
         }}
-        .section h3 {{ color: #0e5881; font-size: 1.2rem; margin: 25px 0 15px; }}
-        .section h4 {{ color: #0e5881; font-size: 1rem; margin: 20px 0 10px; }}
-        .section p {{ margin-bottom: 15px; }}
-        .section ul {{ padding-left: 25px; margin-bottom: 15px; }}
-        .section li {{ margin: 8px 0; }}
-
-        /* Info Box */
-        .info-box {{
-            background: #e8f4fc;
-            border-left: 4px solid #0e5881;
-            padding: 20px 25px;
-            border-radius: 0 8px 8px 0;
-            margin: 20px 0;
-        }}
-        .info-box h4 {{ color: #0e5881; margin-top: 0; margin-bottom: 12px; }}
-
-        .success-box {{
-            background: #e8f5e9;
-            border-left: 4px solid #28a745;
-            padding: 20px 25px;
-            border-radius: 0 8px 8px 0;
-            margin: 20px 0;
-        }}
-        .success-box h4 {{ color: #28a745; margin-top: 0; margin-bottom: 12px; }}
-
-        .warning-box {{
-            background: #fff3e0;
-            border-left: 4px solid #ff9800;
-            padding: 20px 25px;
-            border-radius: 0 8px 8px 0;
-            margin: 20px 0;
-        }}
-        .warning-box h4 {{ color: #e65100; margin-top: 0; margin-bottom: 12px; }}
-
-        /* Cards */
-        .card-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
-            margin: 25px 0;
-        }}
-        .card {{
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            border: 1px solid #e0e0e0;
-        }}
-        .card h4 {{ color: #0e5881; margin-top: 0; margin-bottom: 12px; font-size: 1.05rem; }}
-        .card ul {{ padding-left: 18px; }}
-        .card li {{ margin: 6px 0; font-size: 0.95rem; }}
-        .card p {{ font-size: 0.95rem; margin-bottom: 10px; }}
-
-        /* Price Section */
-        .price-section {{
-            background: linear-gradient(135deg, #0e5881 0%, #0a4563 100%);
-            color: white;
-            padding: 60px 40px;
-            text-align: center;
-        }}
-        .price-section h2 {{ color: white; border-bottom-color: #ffcc33; display: inline-block; }}
-        .price-box {{
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 35px;
-            margin: 35px auto;
-            max-width: 500px;
-        }}
-        .price {{ font-size: 3.5rem; font-weight: 700; color: #ffcc33; }}
-        .price-detail {{ margin-top: 15px; opacity: 0.95; font-size: 1.05rem; }}
-
-        /* Timeline */
-        .timeline {{ margin: 25px 0; }}
-        .timeline-item {{
+        .nav-container {{
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
-            margin-bottom: 20px;
-            align-items: flex-start;
+            align-items: center;
+            padding: 0 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
         }}
-        .timeline-week {{
-            background: #0e5881;
+        .nav-container::-webkit-scrollbar {{ display: none; }}
+        .nav-menu-items {{
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 5px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }}
+        .nav-menu-item {{ position: relative; }}
+        .nav-menu-link {{
+            display: block;
+            padding: 18px 20px;
             color: white;
-            padding: 10px 18px;
-            border-radius: 25px;
+            text-decoration: none;
+            font-size: 10pt;
             font-weight: 600;
-            font-size: 0.85rem;
-            min-width: 90px;
-            text-align: center;
-            margin-right: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            border-bottom: 3px solid transparent;
         }}
-        .timeline-content {{ flex: 1; }}
-        .timeline-content h4 {{ color: #0e5881; margin-bottom: 8px; margin-top: 0; }}
+        .nav-menu-link:hover {{
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffcc33;
+            border-bottom-color: #ffcc33;
+        }}
+        .nav-menu-link.active {{
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffcc33;
+            border-bottom-color: #ffcc33;
+        }}
+        .nav-menu-toggle {{
+            display: none;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 10px 15px;
+            margin-left: auto;
+            transition: all 0.3s ease;
+            line-height: 1;
+            min-width: 50px;
+            min-height: 50px;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }}
+        .nav-menu-toggle:hover {{
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.05);
+        }}
 
-        /* Footer */
-        .footer {{
-            background: #0e5881;
+        /* Cover Section */
+        .cover {{
+            background: linear-gradient(135deg, #0e5881 0%, #0a4563 100%);
             color: white;
             padding: 50px 40px;
             text-align: center;
         }}
-        .footer h2 {{ color: white; border: none; margin-bottom: 20px; }}
-        .contact-info {{
+        .cover h1 {{
+            font-size: 32pt;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }}
+        .cover h2 {{
+            font-size: 18pt;
+            font-weight: 400;
+            margin-bottom: 20px;
+            color: white;
+            opacity: 0.95;
+        }}
+        .cover .meta {{
             display: flex;
             justify-content: center;
-            gap: 35px;
+            gap: 30px;
+            margin-top: 30px;
             flex-wrap: wrap;
-            margin-top: 25px;
         }}
-        .contact-item {{
+        .meta-item {{
+            background: rgba(255,255,255,0.15);
+            padding: 15px 25px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            min-width: 180px;
+        }}
+        .meta-item strong {{
+            display: block;
+            font-size: 9pt;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }}
+        .meta-item span {{ font-size: 16pt; font-weight: 700; }}
+
+        /* Content Sections */
+        .content {{ padding: 30px 40px; }}
+        .section {{ margin-bottom: 30px; page-break-inside: avoid; }}
+        h2 {{
+            color: #0e5881;
+            font-size: 18pt;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #ffcc33;
+            page-break-after: avoid;
+        }}
+        h3 {{ color: #2d2d2d; font-size: 14pt; margin: 20px 0 10px 0; page-break-after: avoid; }}
+        h4 {{ color: #444; font-size: 12pt; margin: 15px 0 8px 0; page-break-after: avoid; }}
+        p {{ color: #555; margin-bottom: 10px; line-height: 1.7; }}
+        ul, ol {{ margin: 10px 0 10px 30px; color: #555; }}
+        li {{ margin-bottom: 6px; line-height: 1.6; color: inherit; }}
+
+        /* Highlight Boxes */
+        .info-box {{
+            background: #e8f4f8;
+            border-left: 4px solid #0e5881;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            page-break-inside: avoid;
+        }}
+        .success-box {{
+            background: #E8F5E9;
+            border-left: 4px solid #4CAF50;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            page-break-inside: avoid;
+        }}
+        .warning-box {{
+            background: #FFF3E0;
+            border-left: 4px solid #FF9800;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            page-break-inside: avoid;
+        }}
+
+        /* Price Box */
+        .price-box {{
+            background: linear-gradient(135deg, #0e5881 0%, #0a4563 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            box-shadow: 0 10px 30px rgba(14,88,129,0.3);
+            page-break-inside: avoid;
+            border: 3px solid #ffcc33;
+        }}
+        .price-box h3 {{ color: white; margin-top: 0; font-size: 16pt; margin-bottom: 15px; }}
+        .price-item {{
+            background: rgba(255,255,255,0.1);
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 8px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            font-size: 1.05rem;
+        }}
+        .price-item .label {{ font-size: 12pt; font-weight: 500; color: white; }}
+        .price-item .amount {{ font-size: 16pt; font-weight: 700; color: white; }}
+        .price-box p, .price-box ul, .price-box ol, .price-box li, .price-box h4 {{ color: white; }}
+
+        /* Cards */
+        .card-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }}
+        .card {{
+            background: #f9f9f9;
+            border-left: 4px solid #ffcc33;
+            padding: 20px;
+            border-radius: 8px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            page-break-inside: avoid;
+        }}
+        .card:hover {{ transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }}
+        .card h4 {{ color: #0e5881; margin-top: 0; font-size: 13pt; }}
+
+        /* Checklist */
+        .checklist {{ list-style: none; padding-left: 0; }}
+        .checklist li {{ padding-left: 30px; position: relative; margin-bottom: 8px; }}
+        .checklist li:before {{
+            content: "\\2713";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 14pt;
         }}
 
-        /* Mobile */
+        /* Footer */
+        .footer {{
+            background: #1a1a1a;
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }}
+        .footer p {{ color: #ccc; margin: 5px 0; font-size: 9pt; }}
+        .footer strong {{ color: #ffcc33; }}
+
+        /* Responsive Design */
         @media (max-width: 768px) {{
-            .cover {{ padding: 50px 25px; }}
-            .cover h1 {{ font-size: 1.8rem; }}
-            .section {{ padding: 35px 25px; }}
-            .card-grid {{ grid-template-columns: 1fr; }}
-            .price {{ font-size: 2.5rem; }}
-            .contact-info {{ flex-direction: column; gap: 15px; }}
-            .timeline-item {{ flex-direction: column; }}
-            .timeline-week {{ margin-bottom: 10px; }}
+            .nav-menu {{
+                position: -webkit-sticky !important;
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 9999 !important;
+            }}
+            .nav-container {{
+                flex-wrap: wrap;
+                position: relative;
+                min-height: 65px;
+                padding: 10px 20px;
+            }}
+            .nav-menu-items {{
+                flex-direction: column;
+                width: 100%;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.4s ease-in-out;
+            }}
+            .nav-menu-items.active {{
+                max-height: 800px;
+                padding-bottom: 10px;
+            }}
+            .nav-menu-toggle {{
+                display: flex !important;
+                position: fixed;
+                right: 15px;
+                top: 10px;
+                z-index: 10001 !important;
+                width: 55px;
+                height: 55px;
+                background: rgba(255, 204, 51, 0.3);
+                border: 3px solid #ffcc33;
+            }}
+            .nav-menu-link {{
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                border-left: 3px solid transparent;
+                padding: 15px 20px;
+            }}
+            .header {{ flex-direction: column; text-align: center; }}
+            .header-info {{ text-align: center; margin-top: 15px; }}
+            .content {{ padding: 20px; }}
+            .cover h1 {{ font-size: 24pt; }}
+            .card-grid {{ grid-template-columns: 1fr !important; }}
+            body {{ font-size: 11pt; }}
+            .meta {{ flex-direction: column; gap: 15px !important; }}
+            .meta-item {{ min-width: auto; width: 100%; }}
         }}
 
+        /* Print Styles */
         @media print {{
-            .section {{ page-break-inside: avoid; }}
-            .price-section {{ page-break-before: always; }}
+            body {{ background: white; }}
+            .container {{ box-shadow: none; }}
+            .nav-menu {{ display: none; }}
+            .section, .card, .info-box, .success-box, .warning-box, .price-box {{ page-break-inside: avoid; }}
+            h2, h3, h4 {{ page-break-after: avoid; }}
         }}
     </style>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {{
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.getElementById('navMenu');
+
+            if (navToggle) {{
+                navToggle.addEventListener('click', (e) => {{
+                    e.stopPropagation();
+                    navMenu.classList.toggle('active');
+                }});
+                document.addEventListener('click', (e) => {{
+                    if (!navToggle.contains(e.target) && !navMenu.contains(e.target)) {{
+                        navMenu.classList.remove('active');
+                    }}
+                }});
+            }}
+
+            document.querySelectorAll('.nav-menu-link').forEach(link => {{
+                link.addEventListener('click', function(e) {{
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    if (targetSection) {{
+                        const navHeight = document.querySelector('.nav-menu').offsetHeight;
+                        const targetPosition = targetSection.offsetTop - navHeight;
+                        window.scrollTo({{ top: targetPosition, behavior: 'smooth' }});
+                        navMenu.classList.remove('active');
+                    }}
+                }});
+            }});
+
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-menu-link');
+            function highlightNavigation() {{
+                let current = '';
+                sections.forEach(section => {{
+                    const sectionTop = section.offsetTop;
+                    if (window.pageYOffset >= sectionTop - 200) {{
+                        current = section.getAttribute('id');
+                    }}
+                }});
+                navLinks.forEach(link => {{
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${{current}}`) {{
+                        link.classList.add('active');
+                    }}
+                }});
+            }}
+            window.addEventListener('scroll', highlightNavigation);
+            highlightNavigation();
+        }});
+    </script>
 </head>
 <body>
     <div class="container">
-        <!-- Cover -->
+        <!-- Header with Logo -->
+        <div class="header">
+            <div class="logo-container">
+                <img src="https://mediaforce.ca/wp-content/uploads/2025/10/mf-logo2.png" alt="Mediaforce" style="height: 60px; width: auto;">
+            </div>
+            <div class="header-info">
+                <h1>Marketing Proposal</h1>
+                <p>Prepared for {company}</p>
+                <p>{today}</p>
+            </div>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="nav-menu">
+            <div class="nav-container">
+                <ul class="nav-menu-items" id="navMenu">
+                    {nav_items}
+                </ul>
+                <button class="nav-menu-toggle" id="navToggle">&#9776;</button>
+            </div>
+        </nav>
+
+        <!-- Cover Section -->
         <div class="cover">
-            <img src="https://mediaforce.ca/wp-content/uploads/2025/10/mf-logo2.png" alt="Mediaforce">
-            <h1>Digital Marketing Proposal</h1>
-            <div class="subtitle">Prepared for {company}</div>
-            <div class="services">{''.join(service_badges)}</div>
-            <div class="date">{today}</div>
-        </div>
+            <h1>{company}</h1>
+            <h2>Strategic Digital Marketing Proposal</h2>
+            <p style="font-size: 12pt; margin-top: 20px; color: white;">Driving Lead Generation & Customer Acquisition</p>
 
-        <!-- Executive Summary -->
-        <div class="section">
-            <h2>Executive Summary</h2>
-            {extract_section(ai_content, 'EXECUTIVE SUMMARY', 'UNDERSTANDING YOUR BUSINESS')}
-        </div>
-
-        <!-- Understanding Your Business -->
-        <div class="section section-alt">
-            <h2>Understanding Your Business</h2>
-            {extract_section(ai_content, 'UNDERSTANDING YOUR BUSINESS', 'YOUR GOALS')}
-        </div>
-
-        <!-- Goals & Vision -->
-        <div class="section">
-            <h2>Your Goals & Vision for Success</h2>
-            {extract_section(ai_content, 'YOUR GOALS', 'OUR STRATEGY')}
-        </div>
-
-        <!-- Strategy -->
-        <div class="section section-blue">
-            <h2>Our Strategy & Approach</h2>
-            {extract_section(ai_content, 'OUR STRATEGY', 'IMPLEMENTATION')}
-        </div>
-
-        <!-- Timeline -->
-        <div class="section">
-            <h2>Implementation Timeline</h2>
-            {extract_section(ai_content, 'IMPLEMENTATION', 'INVESTMENT')}
-        </div>
-
-        <!-- Investment -->
-        <div class="price-section">
-            <h2>Your Investment</h2>
-            <div class="price-box">
-                {''.join(service_badges)}
-                <div class="price" style="margin-top: 20px;">${budget:,}/month</div>
-                <div class="price-detail">
-                    Management Fee: ${management_fee:,}/mo | Ad Spend: ${ad_spend:,}/mo
+            <div class="meta">
+                <div class="meta-item">
+                    <strong>Location</strong>
+                    <span>{location if location else 'Canada'}</span>
+                </div>
+                <div class="meta-item">
+                    <strong>Services</strong>
+                    <span>{len(services)}-Channel Strategy</span>
+                </div>
+                <div class="meta-item">
+                    <strong>Monthly Budget</strong>
+                    <span>${budget:,}/mo</span>
                 </div>
             </div>
-            {extract_section(ai_content, 'INVESTMENT', 'NEXT STEPS')}
         </div>
 
-        <!-- Next Steps -->
+        <!-- Content -->
+        <div class="content">
+
+            <!-- Executive Summary -->
+            <section id="executive-summary" class="section">
+                <h2>&#128202; Executive Summary</h2>
+                {extract_section(ai_content, 'EXECUTIVE SUMMARY', 'UNDERSTANDING YOUR BUSINESS')}
+            </section>
+
+            <!-- Understanding Your Business -->
+            <section id="your-business" class="section">
+                <h2>&#127970; Understanding Your Business</h2>
+                {extract_section(ai_content, 'UNDERSTANDING YOUR BUSINESS', 'YOUR GOALS')}
+            </section>
+
+            <!-- Goals & Vision -->
+            <section id="goals" class="section">
+                <h2>&#127919; Your Goals & Vision for Success</h2>
+                {extract_section(ai_content, 'YOUR GOALS', 'OUR STRATEGY')}
+            </section>
+
+            <!-- Strategy -->
+            <section id="strategy" class="section">
+                <h2>&#128640; Our Strategy & Approach</h2>
+                {extract_section(ai_content, 'OUR STRATEGY', 'IMPLEMENTATION')}
+            </section>
+
+            <!-- Timeline -->
+            <section id="timeline" class="section">
+                <h2>&#128197; Implementation Timeline</h2>
+                {extract_section(ai_content, 'IMPLEMENTATION', 'INVESTMENT')}
+            </section>
+
+            <!-- Investment -->
+            <section id="investment" class="section">
+                <h2>&#128176; Investment & Pricing</h2>
+
+                <div class="price-box">
+                    <h3>&#127919; Your Monthly Investment</h3>
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        {price_items_html}
+                    </div>
+                </div>
+
+                <div style="color: #333;">
+                    {extract_section(ai_content, 'INVESTMENT', 'NEXT STEPS')}
+                </div>
+            </section>
+
+            <!-- About Mediaforce -->
+            <section id="about-mediaforce" class="section">
+                <h2>&#127970; About Mediaforce</h2>
+
+                <div class="success-box">
+                    <h3 style="margin-top: 0;">Your Digital Growth Partner</h3>
+                    <p>Mediaforce is a full-service digital marketing agency with deep expertise in website development, lead generation, and growth marketing for B2B professional services firms.</p>
+                </div>
+
+                <h3>Why Choose Mediaforce?</h3>
+                <ul class="checklist">
+                    <li><strong>Proven Track Record:</strong> Years of experience delivering results for Canadian businesses</li>
+                    <li><strong>Data-Driven Approach:</strong> Every decision backed by analytics and performance data</li>
+                    <li><strong>Full-Service Capability:</strong> From strategy to execution, all under one roof</li>
+                    <li><strong>Dedicated Team:</strong> Direct access to senior strategists, not junior account managers</li>
+                    <li><strong>Transparent Reporting:</strong> Clear, actionable insights delivered monthly</li>
+                </ul>
+
+                <!-- Client Referral - Augusto Bresolin -->
+                <h3>Client Reference</h3>
+                <div class="info-box">
+                    <h4 style="margin-top: 0;">PNL Communications - Satisfied Client</h4>
+                    <p>We've worked with PNL Communications on their digital marketing and website development. Feel free to reach out to learn about their experience working with Mediaforce.</p>
+
+                    <div style="background: white; border-radius: 8px; border-left: 4px solid #0e5881; padding: 20px; margin-top: 20px;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                            <img src="https://mediaforce.ca/wp-content/uploads/2025/11/1751996871221.jpeg" alt="Augusto Bresolin" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                            <div>
+                                <p style="margin: 0; font-weight: 600; color: #333;">Augusto Bresolin</p>
+                                <p style="margin: 5px 0; color: #666; font-size: 10pt;">He/Him</p>
+                                <p style="margin: 0; color: #666; font-size: 10pt;">Project Process Analyst, PNL Communications</p>
+                            </div>
+                        </div>
+                        <p style="margin: 10px 0; color: #333;"><strong>&#128222;</strong> (902) 431-3131</p>
+                        <p style="margin: 10px 0; color: #333;"><strong>&#128231;</strong> augusto@pnl.ca</p>
+                        <p style="margin: 10px 0; color: #333;"><strong>&#127760;</strong> www.pnl.ca</p>
+                    </div>
+                </div>
+
+                <!-- Contact Information - Joe Bongiorno -->
+                <h3>Contact Information</h3>
+                <div class="info-box" style="text-align: center;">
+                    <p><strong>We're here to answer any questions about this proposal, our approach, or how we'll achieve your goals.</strong></p>
+                    <div style="margin: 20px 0;">
+                        <img src="https://mediaforce.ca/wp-content/uploads/2025/11/Joe-Bongiorno.png" alt="Joe Bongiorno" style="width: 120px; height: auto; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    </div>
+                    <p style="margin-top: 15px; color: #333;"><strong>Joe Bongiorno</strong><br>
+                    Digital Marketing Strategist</p>
+                    <p style="margin-top: 10px; color: #333;">&#128231; Email: <strong>jbon@mediaforce.ca</strong></p>
+                    <p style="color: #333;">&#128222; Phone: <strong>613-265-2120</strong></p>
+                    <p style="color: #333;">&#127760; Website: <strong>www.mediaforce.ca</strong></p>
+                    <p style="margin-top: 15px; color: #333;"><strong>Response Time:</strong> Same business day</p>
+                </div>
+            </section>
+
+            <!-- Next Steps -->
+            <section id="next-steps" class="section">
+                <h2>&#9989; Next Steps</h2>
+                {extract_section(ai_content, 'NEXT STEPS', None)}
+
+                <div class="success-box" style="margin-top: 30px;">
+                    <h3 style="margin-top: 0;">Let's Build Your Lead Generation Engine</h3>
+                    <p style="color: #333;">With the right digital marketing strategy, {company} can establish itself as a leader in your market. We're committed to delivering reliable, measurable results.</p>
+                    <p style="margin-top: 15px; font-size: 12pt; color: #333;"><strong>Ready to get started? Let's schedule your kickoff call.</strong></p>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Footer Logos -->
+        <div style="text-align: center; margin: 40px 0 20px 0;">
+            <img src="https://mediaforce.ca/wp-content/uploads/2025/11/footer-logos.png" alt="Partner Platforms" style="max-width: 100%; height: auto;">
+        </div>
+
+        <!-- Footer -->
         <div class="footer">
-            <h2>Ready to Get Started?</h2>
-            {extract_section(ai_content, 'NEXT STEPS', None)}
-            <div class="contact-info">
-                <div class="contact-item">📧 jbon@mediaforce.ca</div>
-                <div class="contact-item">📞 613 265 2120</div>
-                <div class="contact-item">🌐 mediaforce.ca</div>
-            </div>
+            <p><strong>MEDIAFORCE</strong> - Digital Marketing Excellence</p>
+            <p>This proposal is valid for 30 days from the date of issue.</p>
+            <p>&copy; 2025 Mediaforce. All rights reserved.</p>
         </div>
     </div>
 </body>
